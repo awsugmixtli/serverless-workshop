@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Dark theme to match portfolio */
+        }
+        /* Simple spinner animation */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #2dd4bf; /* Teal color */
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <!-- Main Container -->
+    <div class="max-w-2xl mx-auto p-6 md:p-12 text-center">
+
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-white">AWS AI Image Generator</h1>
+            <p class="text-xl mt-2 text-teal-300">Powered by Amazon Bedrock & Lambda</p>
+        </header>
+
+        <main>
+            <div id="generator-form" class="bg-gray-800 p-8 rounded-lg shadow-lg">
+                <div class="mb-6">
+                    <label for="prompt" class="block text-left text-lg font-medium text-gray-200 mb-2">Enter your prompt</label>
+                    <textarea id="prompt" name="prompt" rows="3" class="w-full bg-gray-700 text-white rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-teal-400" placeholder="e.g., A photo of a robot reading a book on a beach"></textarea>
+                </div>
+                
+                <button id="generate-btn" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+                    Generate Image
+                </button>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading" class="hidden mt-8 flex flex-col items-center justify-center">
+                <div class="spinner"></div>
+                <p class="text-lg text-gray-400 mt-4">Generating your masterpiece... Please wait.</p>
+            </div>
+
+            <!-- Error Message Display -->
+            <div id="error-message" class="hidden mt-6 bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded-lg">
+                <!-- Error content will be inserted here by JS -->
+            </div>
+        </main>
+        
+        <footer class="text-center text-gray-500 mt-12 pt-6 border-t border-gray-700">
+            <p><a href="https://awsugmixtli.com" target="_blank">AWS User Group Mixtli</a>. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <script>
+        const generateBtn = document.getElementById('generate-btn');
+        const promptInput = document.getElementById('prompt');
+        const generatorForm = document.getElementById('generator-form');
+        const loadingIndicator = document.getElementById('loading');
+        const errorMessageDiv = document.getElementById('error-message');
+
+        // IMPORTANT: You must replace this with their actual API Gateway Invoke URL
+        const API_GATEWAY_URL = 'https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/generate-image';
+        const API_KEY = 'YOUR_API_KEY_HERE';
+
+        generateBtn.addEventListener('click', async () => {
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                displayError('Prompt cannot be empty.');
+                return;
+            }
+
+            if (API_KEY === 'YOUR_API_KEY_HERE') {
+                displayError('Please update the API_KEY in the HTML file.');
+                return;
+            }
+
+            // Hide form, show loader, clear previous errors
+            generatorForm.style.display = 'none';
+            errorMessageDiv.style.display = 'none';
+            loadingIndicator.style.display = 'flex';
+
+            try {
+                const response = await fetch(API_GATEWAY_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({ prompt: prompt }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `An error occurred: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                // Redirect to the new page with the image URL
+                window.location.href = `show-image.html?imageUrl=${encodeURIComponent(result.imageUrl)}`;
+
+            } catch (error) {
+                console.error('Error:', error);
+                displayError(error.message);
+                // Show form again on error
+                generatorForm.style.display = 'block';
+                loadingIndicator.style.display = 'none';
+            }
+        });
+
+        function displayError(message) {
+            errorMessageDiv.textContent = `Error: ${message}`;
+            errorMessageDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
