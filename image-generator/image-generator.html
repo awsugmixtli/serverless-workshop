@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Image Generator</title>
     <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -77,8 +77,8 @@
         const errorMessageDiv = document.getElementById('error-message');
 
         // IMPORTANT: You must replace this with their actual API Gateway Invoke URL
-        const API_GATEWAY_URL = 'https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/generate-image';
-        const API_KEY = 'YOUR_API_KEY_HERE';
+        const API_GATEWAY_URL = 'https://4uq54h1d5m.execute-api.us-east-1.amazonaws.com/prod/generate-image';
+        const API_KEY = 'Mb44fEaza47urKChCOMKR1UUXuAZhZrJ8WG9UpmO';
 
         generateBtn.addEventListener('click', async () => {
             const prompt = promptInput.value.trim();
